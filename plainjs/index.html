@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cross-Domain Iframe Communication Demo</title>
+  <style>
+    body { font-family: sans-serif; }
+    iframe { width: 45vw; height: 40vh; border: 1px solid #888; margin: 1vw; }
+    .container { display: flex; justify-content: space-around; }
+  </style>
+</head>
+<body>
+  <h1>Cross-Domain Iframe Communication Demo</h1>
+  <div class="container">
+    <iframe id="iframeA" name="iframeA" src="http://localhost:3001/iframeA.html"></iframe>
+    <iframe id="iframeB" name="iframeB" src="http://localhost:3001/iframeB.html"></iframe>
+  </div>
+  <script>
+    // Store iframe window references
+    const iframeA = document.getElementById('iframeA');
+    const iframeB = document.getElementById('iframeB');
+
+    // Wait for both iframes to load
+    let loadedA = false, loadedB = false;
+
+    iframeA.addEventListener('load', () => {
+      loadedA = true;
+      trySendReferences();
+    });
+
+    iframeB.addEventListener('load', () => {
+      loadedB = true;
+      trySendReferences();
+    });
+
+    function trySendReferences() {
+      if (loadedA && loadedB) {
+        // Send iframeB's name to iframeA
+        iframeA.contentWindow.postMessage(
+          {
+            type: 'SET_OTHER_IFRAME_NAME',
+            otherIframeName: 'iframeB'
+          },
+          'http://localhost:3001'
+        );
+        // Send iframeA's name to iframeB
+        iframeB.contentWindow.postMessage(
+          {
+            type: 'SET_OTHER_IFRAME_NAME',
+            otherIframeName: 'iframeA'
+          },
+          'http://localhost:3001'
+        );
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Iframe B</title>
+  <style>
+    body { font-family: sans-serif; }
+    #received { margin-top: 1em; color: #000077; }
+  </style>
+</head>
+<body>
+  <h2>Iframe B</h2>
+  <button id="sendBtn">Send Current Time to Iframe A</button>
+  <div id="received">No message received yet.</div>
+  <script>
+    let otherIframeName = null;
+    let otherOrigin = 'http://localhost:3001';
+
+    document.getElementById('sendBtn').onclick = function() {
+      if (!otherIframeName) {
+        alert('Other iframe not ready yet!');
+        return;
+      }
+      const now = new Date().toLocaleTimeString();
+      window.parent.frames[otherIframeName].document.getElementById("received").textContent = 'Received time from B: ' + now;
+    };
+
+    window.addEventListener('message', (event) => {
+      if (event.origin !== 'http://localhost:3000' && event.origin !== 'http://localhost:3001') return;
+
+      const data = event.data;
+      if (data && data.type === 'SET_OTHER_IFRAME_NAME') {
+        otherIframeName = data.otherIframeName;
+      }
+    });
+  </script>
+</body>
+</html>
